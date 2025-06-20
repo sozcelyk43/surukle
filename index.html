@@ -39,14 +39,21 @@
             top: 0;
             left: 0;
             pointer-events: none;
+            z-index: 10;
         }
         .screen.show {
             opacity: 1;
             pointer-events: auto;
+            z-index: 20;
         }
         #home-screen {
             justify-content: center;
             background: linear-gradient(to bottom, #87CEEB 0%, #a2d2ff 100%);
+            z-index: 30;
+        }
+        .home-content {
+            z-index: 15;
+            position: relative;
         }
         #home-mascot {
             width: 150px;
@@ -176,17 +183,61 @@
         #surprise-box-closed { width: 150px; height: 150px; background-color: #8e44ad; border: 5px solid #ffd700; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 5em; color: white; animation: shakeBox 1.2s infinite ease-in-out; }
         @keyframes shakeBox { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px) rotate(-4deg); } 75% { transform: translateX(10px) rotate(4deg); } }
         #surprise-message { margin-top: 30px; font-size: 2.5em; color: white; font-weight: 700; text-shadow: 2px 2px 8px black; background-color: rgba(0,0,0,0.5); padding: 15px 25px; border-radius: 10px; }
+        
+        .balloons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 5;
+        }
+        .balloon {
+            position: absolute;
+            bottom: -150px;
+            width: 60px;
+            height: 75px;
+            background-color: rgba(255, 105, 180, 0.7);
+            border-radius: 50%;
+            animation: floatUp 15s infinite ease-in;
+        }
+        .balloon::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-top: 10px solid inherit;
+        }
+        .balloon:nth-child(1) { left: 10%; animation-duration: 15s; background-color: rgba(255, 105, 180, 0.7); border-top-color: rgba(255, 105, 180, 0.7);}
+        .balloon:nth-child(2) { left: 30%; animation-duration: 12s; animation-delay: 2s; background-color: rgba(135, 206, 235, 0.7); border-top-color: rgba(135, 206, 235, 0.7);}
+        .balloon:nth-child(3) { left: 55%; animation-duration: 18s; animation-delay: 1s; background-color: rgba(255, 215, 0, 0.7); border-top-color: rgba(255, 215, 0, 0.7);}
+        .balloon:nth-child(4) { left: 75%; animation-duration: 14s; animation-delay: 4s; background-color: rgba(144, 238, 144, 0.7); border-top-color: rgba(144, 238, 144, 0.7);}
+        @keyframes floatUp {
+            to {
+                transform: translateY(-120vh) translateX(20px) rotate(15deg);
+            }
+        }
     </style>
 </head>
 <body>
 
     <div id="home-screen" class="screen show">
+        <div class="balloons">
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+            <div class="balloon"></div>
+        </div>
         <div class="home-content">
-            <img id="home-mascot" src="mascot.svg" alt="Maceracı Dostumuz">
-            <h1 class="game-main-title">Sürükle & Bırak Macerası</h1>
+            <img id="home-mascot" src="yeni_maskot.png" alt="Maceracı Dostumuz">
+            <h1>Sürükle & Bırak Macerası</h1>
             <div class="home-main-actions">
                 <button id="show-rules-btn" class="btn">❓ Kurallar</button>
-                <button id="start-btn" class="btn">▶️ Oyuna Başla</button>
+                <button id="start-btn" class="btn"▶️ Oyuna Başla</button>
             </div>
         </div>
     </div>
@@ -246,6 +297,8 @@
     <audio id="correct-sound" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQIAAAB"></audio>
     <audio id="wrong-sound" src="data:audio/wav;base64,UklGRkIAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YSIAAAA"></audio>
     <audio id="complete-sound" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQoAAAB"></audio>
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

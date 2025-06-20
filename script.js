@@ -21,7 +21,7 @@ const currentLangData = lang.tr;
 const backgroundColors = ['#f0f8ff', '#e6f3e6', '#fff3e6', '#ffe6f0', '#f3e6f3', '#e6e6ff', '#e0f7fa', '#e6fff3', '#fff9e6', '#f5f5f5', '#F5E6FF', '#E6FFF5', '#FFE6F0', '#F0E6FF', '#FFF0E6', '#FFF9E6', '#E6FFFA', '#FFEEE6', '#EBE6FF', '#FFF0F5', '#fadde1', '#fff0f5', '#e6e6fa', '#b0e0e6', '#add8e6'];
 const emojiPools = {
     fruits: ['🍎', '🍌', '🍓', '🍇', '🍉', '🍍', '🥭', '🥝', '🍑', '🍒', '🥥', '🥑', '🍋', '🍐', '🫐', '🍈', '🍊', '🍅'],
-    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦄', '🦓', '🦒', '🦉', '🦋', '🐞', '🐢'],
+    animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐸', '🐵', '🦄', '🦓', '🦒', '🦉', '🦋', '🐞', '🐢'],
     vehicles: ['🚗', '🚕', '🚙', '🚌', '🚑', '🚒', '🚓', '🚚', '🚜', '🚲', '🛵', '🏍️', '🚀', '✈️', '🛸', '🚁', '🚤', '🚢', '🚂', '🚆', '🚇'],
     sky: ['☀️', '🌙', '⭐', '☁️', '🌈', '⚡', '☔', '❄️', '🌀', '🌪️', '☄️', '🌌', '🌠', '🌥️', '🌦️', '🫧', '💧', '💨'],
     books: ['📕', '📘', '📙', '📖', '📚', '📜', '📝', '📔', '📗', '📓', '📒', '📋', '✒️', '📏', '🖋️', '📰', '📊', '🗓️'],
@@ -244,14 +244,20 @@ function loadLevel(levelIndex) {
     const levelData = game.levels[levelIndex];
     if (!levelData) { showHomeScreen(); return; }
 
-    let baseDiameter = modifier === 'BIG_CIRCLES' ? 140 : 115;
+    let baseDiameter = 110 + (Math.floor(levelIndex / 5) * 4);
+    baseDiameter = Math.min(baseDiameter, 140);
+    if (modifier === 'BIG_CIRCLES') { baseDiameter = 150; }
+    
     const gameScreenWidthVal = DOM.gameScreenEl.offsetWidth;
     if (gameScreenWidthVal < 380) baseDiameter *= 0.75;
     else if (gameScreenWidthVal < 600) baseDiameter *= 0.9;
+    
     let scaleFactor = 1.0;
-    if (levelData.itemsForDragging.length > 3) scaleFactor -= (levelData.itemsForDragging.length - 3) * 0.06;
-    scaleFactor -= (Math.floor(levelIndex / 10)) * 0.03;
-    scaleFactor = Math.max(0.70, scaleFactor);
+    if (levelData.itemsForDragging.length > 5) {
+        scaleFactor -= (levelData.itemsForDragging.length - 5) * 0.08;
+    }
+    scaleFactor = Math.max(0.65, scaleFactor);
+    
     const itemDiameter = Math.floor(baseDiameter * scaleFactor);
     const zoneDiameter = Math.floor(itemDiameter * 1.15);
     const itemFontSize = Math.floor(itemDiameter * 0.52);
@@ -391,7 +397,16 @@ function handleDrop(targetZone, droppedItemText, draggedElement, modifier, isIni
     if (requiredCorrect > 0 && correctDropZones.length === requiredCorrect) {
         clearInterval(game.timerInterval);
         playSound('complete-sound');
-        setTimeout(showLevelCompleteModal, 500);
+        
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 200,
+                spread: 90,
+                origin: { y: 0.6 }
+            });
+        }
+        
+        setTimeout(showLevelCompleteModal, 1500);
     }
 }
 
