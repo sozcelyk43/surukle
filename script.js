@@ -71,11 +71,13 @@ function showModal(modalEl, show = true) {
 }
 
 function showTimeoutModal() {
-    DOM.timeoutModalTitleEl.textContent = currentLangData.timeoutTitle;
-    DOM.modalMessageEl.textContent = currentLangData.timeoutMessage;
-    DOM.modalOkBtnEl.textContent = "Tamam";
+    if (DOM.timeoutModalTitleEl) DOM.timeoutModalTitleEl.textContent = currentLangData.timeoutTitle;
+    if (DOM.modalMessageEl) DOM.modalMessageEl.textContent = currentLangData.timeoutMessage;
+    if (DOM.modalOkBtnEl) DOM.modalOkBtnEl.textContent = "Tamam";
     showModal(DOM.timeoutModalEl);
-    DOM.modalOkBtnEl.onclick = () => { showModal(DOM.timeoutModalEl, false); loadLevel(game.currentLevel); };
+    if (DOM.modalOkBtnEl) {
+        DOM.modalOkBtnEl.onclick = () => { showModal(DOM.timeoutModalEl, false); loadLevel(game.currentLevel); };
+    }
 }
 
 function showLevelCompleteModal() {
@@ -84,9 +86,9 @@ function showLevelCompleteModal() {
         game.allLevelsData[game.currentLevel].stars = starsWon;
         game.allLevelsData[game.currentLevel].mistakes = game.mistakesThisLevel;
     }
-    DOM.levelScoreValueEl.textContent = game.score;
-    DOM.levelStarsEl.innerHTML = (currentLangData.starFilled).repeat(starsWon) + (currentLangData.starEmpty).repeat(3 - starsWon);
-    DOM.levelMistakesValueEl.textContent = game.mistakesThisLevel;
+    if (DOM.levelScoreValueEl) DOM.levelScoreValueEl.textContent = game.score;
+    if (DOM.levelStarsEl) DOM.levelStarsEl.innerHTML = (currentLangData.starFilled).repeat(starsWon) + (currentLangData.starEmpty).repeat(3 - starsWon);
+    if (DOM.levelMistakesValueEl) DOM.levelMistakesValueEl.textContent = game.mistakesThisLevel;
 
     const nextButtonAction = () => {
         showModal(DOM.levelCompleteModalEl, false);
@@ -99,13 +101,17 @@ function showLevelCompleteModal() {
     };
 
     if (game.currentLevel >= TOTAL_LEVELS - 1) {
-        DOM.levelCompleteModalTitleEl.textContent = currentLangData.gameCompleteTitle;
-        DOM.modalNextLevelBtnEl.textContent = currentLangData.gameCompleteButtonText;
-        DOM.modalNextLevelBtnEl.onclick = () => { showModal(DOM.levelCompleteModalEl, false); showHomeScreen(); };
+        if (DOM.levelCompleteModalTitleEl) DOM.levelCompleteModalTitleEl.textContent = currentLangData.gameCompleteTitle;
+        if (DOM.modalNextLevelBtnEl) {
+            DOM.modalNextLevelBtnEl.textContent = currentLangData.gameCompleteButtonText;
+            DOM.modalNextLevelBtnEl.onclick = () => { showModal(DOM.levelCompleteModalEl, false); showHomeScreen(); };
+        }
     } else {
-        DOM.levelCompleteModalTitleEl.textContent = currentLangData.levelCompleteTitle;
-        DOM.modalNextLevelBtnEl.textContent = currentLangData.next;
-        DOM.modalNextLevelBtnEl.onclick = nextButtonAction;
+        if (DOM.levelCompleteModalTitleEl) DOM.levelCompleteModalTitleEl.textContent = currentLangData.levelCompleteTitle;
+        if (DOM.modalNextLevelBtnEl) {
+            DOM.modalNextLevelBtnEl.textContent = currentLangData.next;
+            DOM.modalNextLevelBtnEl.onclick = nextButtonAction;
+        }
     }
     showModal(DOM.levelCompleteModalEl);
 }
@@ -130,7 +136,7 @@ function showSurpriseScreen() {
             loadLevel(game.currentLevel);
         }, 2500);
     };
-    DOM.surpriseBoxClosedEl.addEventListener('click', handleSurpriseClick);
+    if (DOM.surpriseBoxClosedEl) DOM.surpriseBoxClosedEl.addEventListener('click', handleSurpriseClick);
 }
 
 function showHomeScreen() {
@@ -185,9 +191,9 @@ function updateUIText(activeModifier) {
     const currentLevelData = game.levels[game.currentLevel];
     if(!currentLevelData) return;
     const currentThemeKey = currentLevelData.theme;
-    DOM.gameTitleEl.textContent = currentLangData[currentThemeKey] || "Oyun";
-    DOM.levelIndicatorEl.textContent = `${currentLangData.level}: ${game.currentLevel + 1}`;
-    DOM.scoreEl.textContent = `${currentLangData.score}: ${game.score}`;
+    if (DOM.gameTitleEl) DOM.gameTitleEl.textContent = currentLangData[currentThemeKey] || "Oyun";
+    if (DOM.levelIndicatorEl) DOM.levelIndicatorEl.textContent = `${currentLangData.level}: ${game.currentLevel + 1}`;
+    if (DOM.scoreEl) DOM.scoreEl.textContent = `${currentLangData.score}: ${game.score}`;
     const surpriseInfo = SURPRISE_TYPES.find(s => s.id === activeModifier);
     if (surpriseInfo && DOM.bonusIndicatorEl) {
         DOM.bonusIndicatorEl.textContent = surpriseInfo.text;
@@ -291,22 +297,52 @@ function loadLevel(levelIndex) {
     startTimer(modifier);
 }
 
-function dragStart(event) { if (!event.target.classList.contains('disabled')) { event.target.style.opacity = '0.5'; event.dataTransfer.setData('text', event.target.textContent); } }
-function dragEnd(event) { event.target.style.opacity = '1'; }
-function dragOver(event) { event.preventDefault(); }
+function dragStart(event) {
+    if (event.target.classList.contains('disabled')) return;
+    event.target.style.opacity = '0.5';
+    event.dataTransfer.setData('text/plain', event.target.textContent);
+}
+
+function dragEnd(event) {
+    event.target.style.opacity = '1';
+}
+
+function dragOver(event) {
+    event.preventDefault();
+}
+
+function drop(event, modifier) {
+    event.preventDefault();
+    const droppedItemText = event.dataTransfer.getData('text/plain');
+    const targetZone = event.target.closest('.drop-zone');
+    if (!targetZone) return;
+    const draggedElement = [...DOM.draggableItemsEl.querySelectorAll('.draggable-item')].find(el => el.textContent === droppedItemText && !el.classList.contains('disabled'));
+    if (draggedElement) {
+        handleDrop(targetZone, droppedItemText, draggedElement, modifier);
+    }
+}
 
 function touchStart(event) {
     if (event.target.classList.contains('disabled') || game.touchElement) return;
     event.preventDefault();
     game.touchElement = event.target;
     game.touchElementClone = game.touchElement.cloneNode(true);
-    Object.assign(game.touchElementClone.style, { position: 'fixed', zIndex: '1001', opacity: '0.75', pointerEvents: 'none', width: game.touchElement.style.width, height: game.touchElement.style.height, fontSize: game.touchElement.style.fontSize, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' });
+    Object.assign(game.touchElementClone.style, {
+        position: 'fixed', zIndex: '1001', opacity: '0.75', pointerEvents: 'none',
+        width: game.touchElement.style.width, height: game.touchElement.style.height,
+        fontSize: game.touchElement.style.fontSize, borderRadius: '50%', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        backgroundColor: getComputedStyle(game.touchElement).backgroundColor,
+        border: getComputedStyle(game.touchElement).border,
+        boxShadow: '0 5px 15px rgba(0,0,0,0.2)'
+    });
     document.body.appendChild(game.touchElementClone);
     const touch = event.touches[0];
     game.touchElementClone.style.left = `${touch.clientX - game.touchElementClone.offsetWidth / 2}px`;
     game.touchElementClone.style.top = `${touch.clientY - game.touchElementClone.offsetHeight / 2}px`;
     game.touchElement.style.opacity = '0.4';
 }
+
 function touchMove(event) {
     if (!game.touchElementClone || !game.touchElement) return;
     event.preventDefault();
@@ -314,31 +350,32 @@ function touchMove(event) {
     game.touchElementClone.style.left = `${touch.clientX - game.touchElementClone.offsetWidth / 2}px`;
     game.touchElementClone.style.top = `${touch.clientY - game.touchElementClone.offsetHeight / 2}px`;
 }
+
 function touchEnd(event, modifier) {
     if (!game.touchElement || !game.touchElementClone) return;
-    if (document.body.contains(game.touchElementClone)) document.body.removeChild(game.touchElementClone);
+    game.touchElementClone.remove();
     game.touchElementClone = null;
     game.touchElement.style.opacity = '1';
     const localTouchElement = game.touchElement;
     game.touchElement = null;
     const dropZone = document.elementFromPoint(event.changedTouches[0].clientX, event.changedTouches[0].clientY)?.closest('.drop-zone');
-    if (dropZone) handleDrop(dropZone, localTouchElement.textContent, localTouchElement, modifier);
-}
-function drop(event, modifier) {
-    event.preventDefault();
-    const droppedItemText = event.dataTransfer.getData('text');
-    const targetZone = event.target.closest('.drop-zone');
-    const draggedElement = [...DOM.draggableItemsEl.querySelectorAll('.draggable-item')].find(el => el.textContent === droppedItemText && !el.classList.contains('disabled'));
-    if (targetZone && draggedElement) handleDrop(targetZone, droppedItemText, draggedElement, modifier);
+    if (dropZone) {
+        handleDrop(dropZone, localTouchElement.textContent, localTouchElement, modifier);
+    }
 }
 
 function handleDrop(targetZone, droppedItemText, draggedElement, modifier, isInitialPlacement = false) {
     if (targetZone.dataset.target === droppedItemText && !targetZone.classList.contains('correct')) {
         targetZone.classList.add('correct');
         let pointsToAdd = (modifier === 'DOUBLE_POINTS') ? 20 : 10;
-        if (!isInitialPlacement) game.score += pointsToAdd;
-        if (!isInitialPlacement) playSound('correct-sound');
-        if (draggedElement) { draggedElement.classList.add('disabled'); draggedElement.draggable = false; }
+        if (!isInitialPlacement) {
+            game.score += pointsToAdd;
+            playSound('correct-sound');
+        }
+        if (draggedElement) {
+            draggedElement.classList.add('disabled');
+            draggedElement.draggable = false;
+        }
     } else if (!targetZone.classList.contains('correct')) {
         if (!isInitialPlacement) {
             game.score = Math.max(0, game.score - 5);
@@ -346,9 +383,12 @@ function handleDrop(targetZone, droppedItemText, draggedElement, modifier, isIni
             playSound('wrong-sound');
         }
     }
-    DOM.scoreEl.textContent = `${currentLangData.score}: ${game.score}`;
+    if (DOM.scoreEl) DOM.scoreEl.textContent = `${currentLangData.score}: ${game.score}`;
+    
     const correctDropZones = DOM.dropZonesEl.querySelectorAll('.drop-zone.correct');
-    if (game.levels[game.currentLevel].targets.length > 0 && correctDropZones.length === game.levels[game.currentLevel].targets.length) {
+    const requiredCorrect = game.levels[game.currentLevel].targets.length;
+
+    if (requiredCorrect > 0 && correctDropZones.length === requiredCorrect) {
         clearInterval(game.timerInterval);
         playSound('complete-sound');
         setTimeout(showLevelCompleteModal, 500);
@@ -356,7 +396,7 @@ function handleDrop(targetZone, droppedItemText, draggedElement, modifier, isIni
 }
 
 function init() {
-    const ids = ['home-screen', 'game-screen', 'start-btn', 'show-rules-btn', 'game-title', 'score', 'timer', 'level-indicator', 'draggable-items', 'drop-zones', 'pause-resume-btn', 'game-home-btn', 'surprise-screen', 'surprise-box-closed', 'surprise-message', 'bonus-indicator', 'timeout-modal', 'timeout-modal-title', 'modal-message', 'modal-ok-btn', 'level-complete-modal', 'level-complete-modal-title', 'level-score-value', 'level-stars', 'level-mistakes-text', 'level-mistakes-value', 'modal-next-level-btn', 'modal-home-btn', 'rules-modal', 'close-rules-modal-btn'];
+    const ids = ['home-screen', 'game-screen', 'start-btn', 'show-rules-btn', 'game-title', 'score', 'timer', 'level-indicator', 'draggable-items', 'drop-zones', 'pause-resume-btn', 'game-home-btn', 'surprise-screen', 'surprise-box-closed', 'surprise-message', 'bonus-indicator', 'timeout-modal', 'timeout-modal-title', 'modal-message', 'modal-ok-btn', 'level-complete-modal', 'level-complete-modal-title', 'level-score-value', 'level-stars', 'level-mistakes-value', 'modal-next-level-btn', 'modal-home-btn', 'rules-modal', 'close-rules-modal-btn'];
     ids.forEach(id => {
         const camelCaseId = id.replace(/-(\w)/g, (match, letter) => letter.toUpperCase());
         DOM[`${camelCaseId}El`] = document.getElementById(id);

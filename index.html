@@ -22,110 +22,125 @@
             align-items: center;
             color: #34495e;
             overflow-x: hidden;
-            background-color: #eef2f7;
+            background-color: #87CEEB;
             transition: background-color 0.5s ease;
         }
-        .hidden {
-            display: none !important;
-        }
+        .hidden { display: none !important; }
         .screen {
             width: 100%;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
+            padding: 15px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
             position: absolute;
             top: 0;
             left: 0;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.4s ease, transform 0.4s ease;
             pointer-events: none;
         }
         .screen.show {
             opacity: 1;
-            transform: translateY(0);
             pointer-events: auto;
         }
         #home-screen {
+            justify-content: center;
             background: linear-gradient(to bottom, #87CEEB 0%, #a2d2ff 100%);
         }
+        #home-mascot {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            animation: bounceMascot 2s ease-in-out infinite;
+        }
+        @keyframes bounceMascot { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
         .home-content h1 {
             font-family: 'Lilita One', cursive;
             color: white;
-            font-size: clamp(2.5em, 8vw, 4.5em);
+            font-size: clamp(2.8em, 8vw, 4.5em);
             text-shadow: 4px 4px 0 #1e88e5, 6px 6px 0 rgba(0,0,0,0.2);
             margin-bottom: 30px;
         }
         .home-main-actions {
             display: flex;
-            gap: 20px;
+            gap: 25px;
+            margin-top: 30px;
             flex-wrap: wrap;
             justify-content: center;
         }
         .btn {
-            padding: 15px 30px;
+            padding: 18px 30px;
             font-size: 1.2em;
             cursor: pointer;
             border: none;
             border-radius: 50px;
             font-weight: 700;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            box-shadow: 0 5px 0 #b33900;
+            min-width: 220px;
+            box-shadow: 0 5px 0;
         }
         .btn:active {
             transform: translateY(3px);
-            box-shadow: 0 2px 0 #b33900;
+            box-shadow: 0 2px 0;
         }
-        #start-btn { background-color: #ff8c00; color: white; box-shadow: 0 5px 0 #c76e00; }
-        #show-rules-btn { background-color: #1e90ff; color: white; box-shadow: 0 5px 0 #005a9e; }
+        #start-btn { background-color: #ff8c00; color: white; border-color: #c76e00; box-shadow-color: #c76e00;}
+        #show-rules-btn { background-color: #1e90ff; color: white; border-color: #005a9e; box-shadow-color: #005a9e;}
         
         #game-screen {
-            justify-content: space-between;
+            justify-content: flex-start;
         }
+        .game-header { width: 100%; max-width: 900px; }
         #game-title {
-            background-color: rgba(0, 123, 255, 0.1);
+            background-color: rgba(0, 123, 255, 0.12);
             color: #004a80;
             padding: 14px 20px;
             border-radius: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
             font-size: clamp(1.6em, 5vw, 2.1em);
         }
         .game-info-bar {
-            background-color: rgba(40, 167, 69, 0.1);
+            background-color: rgba(40, 167, 69, 0.12);
             color: #145224;
             padding: 12px;
             border-radius: 12px;
             display: flex;
             justify-content: space-around;
             flex-wrap: wrap;
-            margin-bottom: 15px;
-            width: 100%;
-            max-width: 600px;
+            margin-bottom: 18px;
+            position: relative;
         }
-        #level-indicator, #score, #timer {
-            font-size: clamp(0.9em, 3vw, 1.05em);
-            font-weight: 600;
-            margin: 5px 10px;
+        #bonus-indicator {
+            position: absolute;
+            top: -12px;
+            right: 10px;
+            background-color: #e74c3c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: bold;
         }
-        #timer.warning { color: #dc3545; font-weight: bold; }
-
+        #level-indicator, #score, #timer { font-size: 1.05em; padding: 5px; font-weight: 600; }
+        #timer.warning { color: #dc3545; animation: shake 0.3s infinite; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        
         .game-board {
             flex-grow: 1;
+            width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             gap: 20px;
-            width: 100%;
+            padding: 10px 0;
         }
         .draggable-items, .drop-zones {
             display: flex;
             justify-content: center;
             align-items: center;
             flex-wrap: wrap;
+            width: 100%;
             gap: 15px;
         }
         .draggable-item, .drop-zone {
@@ -137,88 +152,100 @@
             user-select: none;
             -webkit-user-select: none;
             touch-action: none;
-            color: #34495e; /* KİLİT DÜZELTME */
-            position: relative; /* Olası render hatalarını önler */
+            color: #34495e;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .draggable-item {
-            background-color: rgba(255, 255, 255, 0.9);
-            border: 3px solid #007acc;
-        }
-        .draggable-item.disabled {
-            background-color: #d0d0d0 !important;
-            border-color: #a0a0a0 !important;
-            cursor: default;
-            opacity: 0.5;
-        }
-        .drop-zone {
-            border: 3.5px dashed #3498db;
-            background-color: rgba(224, 247, 250, 0.8);
-        }
-        .drop-zone.correct {
-            background-color: #a0e0a0 !important;
-            border-style: solid !important;
-            border-color: #28a745 !important;
-        }
-        #game-controls-bottom {
-            width: 100%;
-            padding-top: 15px;
-            margin-top: 15px;
-        }
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        .modal-content {
-            background-color: #fff;
-            padding: 25px;
-            border-radius: 12px;
-            max-width: 450px;
-            width: 90%;
-        }
+        .draggable-item { background-color: rgba(255, 255, 255, 0.9); border: 3px solid #007acc; }
+        .draggable-item.wiggle { animation: wiggle 0.5s infinite ease-in-out; }
+        @keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+        .draggable-item.disabled { background-color: #d0d0d0 !important; border-color: #a0a0a0 !important; cursor: default; opacity: 0.5; }
+        .drop-zone { border: 3.5px dashed #3498db; background-color: rgba(224, 247, 250, 0.8); }
+        .drop-zone.sparkle { animation: sparkle 1.5s infinite; }
+        @keyframes sparkle { 0%, 100% { box-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700 inset; border-color: #ffd700;} 50% { box-shadow: 0 0 15px #ffd700, 0 0 20px #fff inset; border-color: #fff; } }
+        .drop-zone.correct { background-color: #a0e0a0 !important; border-style: solid !important; border-color: #28a745 !important; }
+        
+        #game-controls-bottom { width: 100%; padding: 12px 0; display: flex; justify-content: center; gap: 20px; margin-top: auto; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; padding: 15px; }
+        .modal-content { background-color: #ffffff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 6px 25px rgba(0,0,0,0.3); max-width: 480px; width: 100%; }
+        #level-stars { font-size: 2em; color: #ffc107; margin-bottom: 12px; }
+        .modal-buttons { display: flex; justify-content: space-around; margin-top: 22px; }
+        
+        #surprise-screen { z-index: 2000; background-color: rgba(0, 0, 0, 0.8); cursor: pointer; }
+        #surprise-box-closed { width: 150px; height: 150px; background-color: #8e44ad; border: 5px solid #ffd700; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 5em; color: white; animation: shakeBox 1.2s infinite ease-in-out; }
+        @keyframes shakeBox { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px) rotate(-4deg); } 75% { transform: translateX(10px) rotate(4deg); } }
+        #surprise-message { margin-top: 30px; font-size: 2.5em; color: white; font-weight: 700; text-shadow: 2px 2px 8px black; background-color: rgba(0,0,0,0.5); padding: 15px 25px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <div id="home-screen" class="screen show">
         <div class="home-content">
-            <h1>Sürükle & Bırak Macerası</h1>
+            <img id="home-mascot" src="mascot.svg" alt="Maceracı Dostumuz">
+            <h1 class="game-main-title">Sürükle & Bırak Macerası</h1>
             <div class="home-main-actions">
                 <button id="show-rules-btn" class="btn">❓ Kurallar</button>
                 <button id="start-btn" class="btn">▶️ Oyuna Başla</button>
             </div>
         </div>
     </div>
-
     <div id="game-screen" class="screen">
         <div class="game-header">
             <h1 id="game-title"></h1>
             <div class="game-info-bar">
-                <div id="score">Puan: 0</div>
-                <div id="timer">Kalan Süre: 30</div>
-                <div id="level-indicator">Bölüm: 1</div>
+                <div id="bonus-indicator" class="hidden"></div>
+                <div id="score"></div>
+                <div id="timer"></div>
+                <div id="level-indicator"></div>
             </div>
         </div>
         <div class="game-board">
-            <div id="drop-zones" class="drop-zones"></div>
             <div id="draggable-items" class="draggable-items"></div>
+            <div id="drop-zones" class="drop-zones"></div>
         </div>
         <div id="game-controls-bottom">
-            <button id="pause-resume-btn" class="btn">Durdur</button>
+            <button id="pause-resume-btn" class="btn"></button>
             <button id="game-home-btn" class="btn">Ana Sayfa</button>
         </div>
     </div>
-
+    <div id="surprise-screen" class="screen hidden">
+        <div id="surprise-box-closed">?</div>
+        <div id="surprise-message" class="hidden"></div>
+    </div>
+    <div id="timeout-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="timeout-modal-title"></h2>
+            <p id="modal-message"></p>
+            <button id="modal-ok-btn" class="btn"></button>
+        </div>
+    </div>
+    <div id="level-complete-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="level-complete-modal-title"></h2>
+            <p>Puanınız: <span id="level-score-value">0</span></p>
+            <div id="level-stars"></div>
+            <p>Hata Sayısı: <span id="level-mistakes-value">0</span></p>
+            <div class="modal-buttons">
+                <button id="modal-next-level-btn" class="btn"></button>
+                <button id="modal-home-btn" class="btn">Ana Sayfa</button>
+            </div>
+        </div>
+    </div>
+    <div id="rules-modal" class="modal">
+        <div class="modal-content">
+            <h2>Oyun Kuralları</h2>
+            <ul>
+                <li><strong>Amaç:</strong> Emojileri doğru kesikli dairelere sürükleyin.</li>
+                <li><strong>Puanlama:</strong> Doğru eşleşme +10, yanlış -5 puan.</li>
+                <li><strong>Sürpriz Turlar:</strong> Özel avantajlar kazanın!</li>
+            </ul>
+            <button id="close-rules-modal-btn" class="btn">Anladım!</button>
+        </div>
+    </div>
     <audio id="correct-sound" src="data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQIAAAB"></audio>
     <audio id="wrong-sound" src="data:audio/wav;base64,UklGRkIAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YSIAAAA"></audio>
     <audio id="complete-sound" src="data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQoAAAB"></audio>
-
     <script src="script.js"></script>
 </body>
 </html>
