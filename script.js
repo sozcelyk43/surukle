@@ -151,6 +151,12 @@ function showGameScreen() {
     if(DOM.homeScreenEl) DOM.homeScreenEl.classList.remove('show');
     if(DOM.gameScreenEl) DOM.gameScreenEl.classList.add('show');
     
+    const bgMusic = document.getElementById('bg-music');
+    if (bgMusic && bgMusic.paused) {
+        bgMusic.volume = 0.3;
+        bgMusic.play();
+    }
+    
     setTimeout(() => {
         game.currentLevel = 0;
         game.score = 0;
