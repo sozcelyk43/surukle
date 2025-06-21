@@ -19,6 +19,7 @@ const lang = {
 };
 const currentLangData = lang.tr;
 const backgroundColors = ['#f0f8ff', '#e6f3e6', '#fff3e6', '#ffe6f0', '#f3e6f3', '#e6e6ff', '#e0f7fa', '#e6fff3', '#fff9e6', '#f5f5f5', '#F5E6FF', '#E6FFF5', '#FFE6F0', '#F0E6FF', '#FFF0E6', '#FFF9E6', '#E6FFFA', '#FFEEE6', '#EBE6FF', '#FFF0F5', '#fadde1', '#fff0f5', '#e6e6fa', '#b0e0e6', '#add8e6'];
+const motivationalPhrases = ["Harika Gidiyorsun!", "İşte bu!", "Çok iyisin!", "Bravo!", "Muhteşem!", "Doğru yoldasın!"];
 const emojiPools = {
     fruits: ['🍎', '🍌', '🍓', '🍇', '🍉', '🍍', '🥭', '🥝', '🍑', '🍒', '🥥', '🥑', '🍋', '🍐', '🫐', '🍈', '🍊', '🍅'],
     animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐸', '🐵', '🦄', '🦓', '🦒', '🦉', '🦋', '🐞', '🐢'],
@@ -73,7 +74,6 @@ function showModal(modalEl, show = true) {
 function showTimeoutModal() {
     if (DOM.timeoutModalTitleEl) DOM.timeoutModalTitleEl.textContent = currentLangData.timeoutTitle;
     if (DOM.modalMessageEl) DOM.modalMessageEl.textContent = currentLangData.timeoutMessage;
-    if (DOM.modalOkBtnEl) DOM.modalOkBtnEl.textContent = "Tamam";
     showModal(DOM.timeoutModalEl);
     if (DOM.modalOkBtnEl) {
         DOM.modalOkBtnEl.onclick = () => { showModal(DOM.timeoutModalEl, false); loadLevel(game.currentLevel); };
@@ -159,6 +159,34 @@ function showGameScreen() {
         }
         loadLevel(game.currentLevel);
     }, 500);
+}
+
+function manageMascot(levelIndex) {
+    const mascotContainer = DOM.gameMascotContainerEl;
+    const speechBubble = DOM.speechBubbleEl;
+
+    if (!mascotContainer || !speechBubble) return;
+
+    mascotContainer.classList.remove('show');
+    speechBubble.classList.remove('show');
+
+    if ((levelIndex + 1) % 4 === 0 && levelIndex > 0) {
+        setTimeout(() => {
+            const phrase = motivationalPhrases[Math.floor(Math.random() * motivationalPhrases.length)];
+            speechBubble.textContent = phrase;
+            
+            mascotContainer.classList.remove('top-left', 'bottom-right');
+            const positionClass = Math.random() > 0.5 ? 'top-left' : 'bottom-right';
+            mascotContainer.classList.add(positionClass);
+
+            mascotContainer.classList.add('show');
+            speechBubble.classList.add('show');
+
+            setTimeout(() => {
+                mascotContainer.classList.remove('show');
+            }, 4000);
+        }, 1500);
+    }
 }
 
 function getLevelItems(levelIndex) {
@@ -282,7 +310,16 @@ function loadLevel(levelIndex) {
     levelData.targets.forEach(targetText => {
         const el = document.createElement('div');
         el.className = 'drop-zone';
-        if (targetText === hintTarget) el.classList.add('sparkle');
+        if (targetText === hintTarget) {
+            el.classList.add('sparkle');
+            const matchingDraggable = [...DOM.draggableItemsEl.childNodes].find(dragEl => dragEl.textContent === targetText);
+            if(matchingDraggable) {
+                setTimeout(() => {
+                    matchingDraggable.classList.add('hint-flash');
+                    setTimeout(() => matchingDraggable.classList.remove('hint-flash'), 2000);
+                }, 500);
+            }
+        }
         el.dataset.target = targetText;
         el.textContent = targetText;
         Object.assign(el.style, { width: `${zoneDiameter}px`, height: `${zoneDiameter}px`, fontSize: `${itemFontSize}px` });
@@ -301,6 +338,7 @@ function loadLevel(levelIndex) {
     }
     updateUIText(modifier);
     startTimer(modifier);
+    manageMascot(levelIndex);
 }
 
 function dragStart(event) {
@@ -411,11 +449,12 @@ function handleDrop(targetZone, droppedItemText, draggedElement, modifier, isIni
 }
 
 function init() {
-    const ids = ['home-screen', 'game-screen', 'start-btn', 'show-rules-btn', 'game-title', 'score', 'timer', 'level-indicator', 'draggable-items', 'drop-zones', 'pause-resume-btn', 'game-home-btn', 'surprise-screen', 'surprise-box-closed', 'surprise-message', 'bonus-indicator', 'timeout-modal', 'timeout-modal-title', 'modal-message', 'modal-ok-btn', 'level-complete-modal', 'level-complete-modal-title', 'level-score-value', 'level-stars', 'level-mistakes-value', 'modal-next-level-btn', 'modal-home-btn', 'rules-modal', 'close-rules-modal-btn'];
+    const ids = ['home-screen', 'game-screen', 'start-btn', 'show-rules-btn', 'game-title', 'score', 'timer', 'level-indicator', 'draggable-items', 'drop-zones', 'pause-resume-btn', 'game-home-btn', 'surprise-screen', 'surprise-box-closed', 'surprise-message', 'bonus-indicator', 'timeout-modal', 'timeout-modal-title', 'modal-message', 'modal-ok-btn', 'level-complete-modal', 'level-complete-modal-title', 'level-score-value', 'level-stars', 'level-mistakes-value', 'modal-next-level-btn', 'modal-home-btn', 'rules-modal', 'close-rules-modal-btn', 'game-mascot-container'];
     ids.forEach(id => {
         const camelCaseId = id.replace(/-(\w)/g, (match, letter) => letter.toUpperCase());
         DOM[`${camelCaseId}El`] = document.getElementById(id);
     });
+    DOM.speechBubbleEl = document.querySelector('.speech-bubble');
     
     game.allLevelsData = Array(TOTAL_LEVELS).fill(null).map(() => ({ itemsUsed: new Set(), stars: 0, mistakes: 0 }));
     game.levels = Array.from({ length: TOTAL_LEVELS }, (_, i) => getLevelItems(i));
