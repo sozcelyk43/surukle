@@ -190,7 +190,7 @@ function manageMascot(levelIndex) {
 
             setTimeout(() => {
                 mascotContainer.classList.remove('show');
-            }, 4000);
+            }, 3000);
         }, 1500);
     }
 }
