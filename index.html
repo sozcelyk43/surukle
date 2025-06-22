@@ -180,82 +180,69 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center; z-index: 1000; padding: 15px; }
         .modal-content { background-color: #ffffff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 6px 25px rgba(0,0,0,0.3); max-width: 480px; width: 100%; }
         #level-stars { font-size: 2em; color: #ffc107; margin-bottom: 12px; }
-        .modal-buttons {
-    display: flex;
-    flex-direction: row; /* Değişiklik burada */
-    justify-content: center;
-    gap: 20px;
-    margin-top: 22px;
-}
+        .modal-buttons { display: flex; flex-direction: row; justify-content: center; gap: 20px; margin-top: 22px; }
         .modal-btn.win { background-color: #28a745; color: white; box-shadow-color: #1c7430;}
         .modal-btn.lose { background-color: #dc3545; color: white; box-shadow-color: #b02a37;}
         .modal-btn.secondary { background-color: #6c757d; color: white; box-shadow-color: #545b62;}
 
-        #surprise-screen { z-index: 2000; background-color: rgba(0, 0, 0, 0.8); cursor: pointer; }
-        #surprise-box-closed { width: 150px; height: 150px; background-color: #8e44ad; border: 5px solid #ffd700; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 5em; color: white; animation: shakeBox 1.2s infinite ease-in-out; }
+        /* YENİLİK 1: Sürpriz kutusu ve mesajı büyütüldü ve ortalandı */
+        #surprise-screen {
+            z-index: 2000;
+            background-color: rgba(0, 0, 0, 0.85);
+            cursor: pointer;
+            justify-content: center; /* Dikey olarak tam ortalamak için eklendi */
+        }
+        #surprise-box-closed {
+            width: 250px;
+            height: 250px;
+            font-size: 8em;
+            border-width: 7px;
+            background-color: #8e44ad;
+            border-color: #ffd700;
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            animation: shakeBox 1.2s infinite ease-in-out;
+        }
         @keyframes shakeBox { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px) rotate(-4deg); } 75% { transform: translateX(10px) rotate(4deg); } }
-        #surprise-message { margin-top: 30px; font-size: 2.5em; color: white; font-weight: 700; text-shadow: 2px 2px 8px black; background-color: rgba(0,0,0,0.5); padding: 15px 25px; border-radius: 10px; }
+        #surprise-message {
+            font-size: 3.5em;
+            padding: 20px 35px;
+            margin-top: 30px;
+            color: white;
+            font-weight: 700;
+            text-shadow: 2px 2px 8px black;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 10px;
+        }
         
-        #game-mascot-container {
-            position: fixed;
-            width: 100px;
-            height: 100px;
-            z-index: 500;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s;
-            transform: scale(0);
-            opacity: 0;
-            pointer-events: none;
-        }
-        #game-mascot-container.show {
-            transform: scale(1);
-            opacity: 1;
-        }
+        #game-mascot-container { position: fixed; width: 100px; height: 100px; z-index: 500; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s; transform: scale(0); opacity: 0; pointer-events: none; }
+        #game-mascot-container.show { transform: scale(1); opacity: 1; }
         #game-mascot-container.top-left { top: 20px; left: 20px; }
         #game-mascot-container.bottom-right { bottom: 80px; right: 20px; }
-        #game-mascot-container img {
-            width: 100%;
-            height: 100%;
-            animation: bounceMascot 2s ease-in-out infinite;
-        }
-        .speech-bubble {
-            position: absolute;
-            background: #fff;
-            border-radius: .4em;
-            padding: 10px;
-            font-size: 0.9em;
-            font-weight: 600;
-            width: 150px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            transform: scale(0);
-            opacity: 0;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
-        }
-        .speech-bubble.show {
-            transform: scale(1);
-            opacity: 1;
-        }
+        #game-mascot-container img { width: 100%; height: 100%; animation: bounceMascot 2s ease-in-out infinite; }
+        
+        .speech-bubble { position: absolute; background: #fff; border-radius: .4em; padding: 10px; font-size: 0.9em; font-weight: 600; width: 150px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); transform: scale(0); opacity: 0; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s; }
+        .speech-bubble.show { transform: scale(1); opacity: 1; }
         .top-left .speech-bubble { bottom: 90%; left: 90%; transform-origin: bottom left; }
         .bottom-right .speech-bubble { top: -60px; right: 90%; transform-origin: bottom right; }
-        .speech-bubble:after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            border: 15px solid transparent;
-        }
-        .top-left .speech-bubble:after {
-            bottom: -15px;
-            left: 20%;
-            border-top-color: #fff;
-            border-bottom: 0;
-            margin-left: -15px;
-        }
-         .bottom-right .speech-bubble:after {
-            bottom: -15px;
-            right: 20%;
-            border-top-color: #fff;
-            border-bottom: 0;
-            margin-right: -15px;
+        .speech-bubble:after { content: ''; position: absolute; width: 0; height: 0; border: 15px solid transparent; }
+        .top-left .speech-bubble:after { bottom: -15px; left: 20%; border-top-color: #fff; border-bottom: 0; margin-left: -15px; }
+        .bottom-right .speech-bubble:after { bottom: -15px; right: 20%; border-top-color: #fff; border-bottom: 0; margin-right: -15px; }
+        
+        @media (max-width: 480px) {
+            .modal-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .modal .btn {
+                padding: 12px 20px;
+                font-size: 1em;
+                min-width: 180px;
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -290,12 +277,10 @@
             <button id="game-home-btn" class="btn">Ana Sayfa</button>
         </div>
     </div>
-    
     <div id="game-mascot-container">
         <div class="speech-bubble"></div>
         <img src="yeni_maskot.png" alt="Oyun İçi Maskot">
     </div>
-
     <div id="surprise-screen" class="screen hidden">
         <div id="surprise-box-closed">?</div>
         <div id="surprise-message" class="hidden"></div>
@@ -314,10 +299,9 @@
             <div id="level-stars"></div>
             <p>Hata Sayısı: <span id="level-mistakes-value">0</span></p>
             <div class="modal-buttons">
-    <button id="modal-home-btn" class="btn modal-btn secondary">Ana Sayfa</button>
-<button id="modal-next-level-btn" class="btn modal-btn win">Sonraki Bölüm</button>
-    
-</div>
+                <button id="modal-next-level-btn" class="btn modal-btn win">Sonraki Bölüm</button>
+                <button id="modal-home-btn" class="btn modal-btn secondary">Ana Sayfa</button>
+            </div>
         </div>
     </div>
     <div id="rules-modal" class="modal">
@@ -331,7 +315,8 @@
             <button id="close-rules-modal-btn" class="btn">Anladım!</button>
         </div>
     </div>
-   <audio id="correct-sound" src="sesler/dogru.mp3"></audio>
+    
+    <audio id="correct-sound" src="sesler/dogru.mp3"></audio>
     <audio id="wrong-sound" src="sesler/yanlis.mp3"></audio>
     <audio id="complete-sound" src="sesler/seviye-tamamlandi.mp3"></audio>
     
